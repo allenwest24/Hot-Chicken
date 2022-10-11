@@ -5,6 +5,13 @@ import json
 DB = "./database.db"
 app = Flask(__name__)
 
+def get_con_cur():
+    con = sql.connect(DB)
+    con.row_factory = sql.Row
+    cur = con.cursor()
+    cur.execute("create table if not exists Ratings (RATING real, DISH text, RESTURAUNT text, LOCATION test)")
+    return con, cur
+
 # GET endpoint that just lists the purpose of the app and its different endpoints.
 @app.route("/")
 def welcome_screen():
@@ -13,10 +20,7 @@ def welcome_screen():
 # GET endpoint to list all current ratings of chickens.
 @app.route('/hot_chickens')
 def hot_chickens():
-    con = sql.connect(DB)
-    con.row_factory = sql.Row
-    cur = con.cursor()
-    cur.execute("create table if not exists Ratings (RATING real, DISH text, RESTURAUNT text, LOCATION text)")
+    con, cur = get_con_cur()
     cur.execute("select * from Ratings")
     rows = cur.fetchall()
     con.commit()
@@ -24,13 +28,22 @@ def hot_chickens():
     return json.dumps( [dict(x) for x in rows] )
 
 # POST endpoint to add a new chicken dish to the list to be rated by everyone.
-# $ curl -X POST -H "Content-type: application/json" -d "{\"mealName\" : \"Nashville's Hottest Chicken\", \"resturaunt\" : \"Mr. Cluckers\", \"location\" : \"Nashville, TN\"}" "localhost:5000/new_chicken_rate"
-@app.route('/new_chicken_rate')
+# $ curl -X POST -H "Content-type: application/json" -d "{\"RATING\" : 9.2, \"DISH\" : \"Nashville's Hottest Chicken\", \"RESTURAUNT\" : \"Mr. Cluckers\", \"LOCATION\" : \"Nashville, TN\"}" "localhost:5000/new_chicken_rate"
+@app.route('/new_chicken_rate', methods = ['POST'])
 def new_chicken_rate():
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
         json = request.json
-        return json
+
+        con, cur = get_con_cur()
+        if not ("RATING" in json and "DISH" in json and "RESTURAUNT" in json and "LOCATION" in json):
+            return "Please provide a RATING, DISH, RESTURAUNT, and LOCATION to add a new chicken rating.\n"
+        chicken = (json["RATING"], json['DISH'], json['RESTURAUNT'], json['LOCATION'])
+        sql = ''' INSERT INTO Ratings(RATING,DISH,RESTURAUNT,LOCATION) VALUES(?,?,?,?) '''     
+        cur.execute(sql, chicken)
+        con.commit()
+        
+        return "Thanks for your chicken rating! Use the endpoint '/hot_chickens' to see how it compares to the competition!\n"
     else:
         return 'Content-Type not supported!'
 
