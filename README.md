@@ -1,7 +1,9 @@
 # Hot Chicken REST API!
 
 ### Purpose:
-I am a huge hot chicken fan and I built this app to track all of the chicken I eat and hear about. Feel free to contribute to the repository of hot chickens.
+Last year I was asked in a technical interview to build and document an REST API with a couple different endpoints and a backend database. At the time, doing this all in 24 hours seemed out of my reach. In one of my first grad courses, however, I was given the opportunity to choose this as one of my midterm projects, so I jumped at it. I have long wanted to get some experience with building API's and databases. This project allowed me to do that and get some closure on that failed technical interview.
+
+This is a REST API to rate the hot chicken dishes I have eaten in various locations, and to track the ones that I saw but haven't gotten to eat just yet. I most likely won't be filling in the database here with my food because I'm mainly posting this just for my own reference in the future and for other people to have a good example of a very simple REST API with a SQLite backend and a couple diverse endpoints. 
 
 ### Setup:
 When launching this API locally, please do the following:
